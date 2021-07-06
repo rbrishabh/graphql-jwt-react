@@ -89,7 +89,7 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
           name="password"
         />
         <button className="home-container-items button" onClick={doAction}>
-          Login
+          {isLogin ? 'Login' : 'Sign Up'}
         </button>
       </div>
     </Layout>
