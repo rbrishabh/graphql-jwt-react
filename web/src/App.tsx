@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { setAccessToken } from './accessToken';
 import Routes from './routes';
-
+import './app.css'
 type AppProps = {
 
 };

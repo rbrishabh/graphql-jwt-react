@@ -1,0 +1,14 @@
+mutation SearchData($countryCode: String!){
+  searchData(countryCode: $countryCode){
+    	name
+    	alpha3Code
+    currencies{
+      code
+      name
+      exchangeRateToSEK
+      exchangeRateFromSEK
+      symbol
+    }
+    population
+  }
+}

@@ -1,0 +1,6 @@
+mutation SearchCountry($searchQuery: String!) {
+  searchCountry(searchQuery: $searchQuery) {
+    name
+    alpha3Code
+  }
+}

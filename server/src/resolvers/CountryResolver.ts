@@ -1,5 +1,5 @@
 import { Country, CurrencyType } from './../entity/Country'
-import { Arg, Query, Resolver, UseMiddleware } from 'type-graphql'
+import { Arg, Mutation, Resolver, UseMiddleware } from 'type-graphql'
 import countryAxiosInstance from '../helpers/countryAxiosInstance'
 import currencyAxiosInstance from '../helpers/currencyAxiosInstance'
 import { client } from './../helpers/redis'
@@ -8,22 +8,27 @@ import { isAuth } from './../isAuth'
 
 @Resolver()
 export class CountryResolver {
-
-  @Query(() => [Country])
+  @Mutation(() => [Country])
   @UseMiddleware(isAuth)
   async searchCountry(
     @Arg('searchQuery', () => String) searchQuery: string
   ): Promise<Country[]> {
-    const response = await countryAxiosInstance.get(`name/${searchQuery}`)
-    return response!.data!.map((res: { name: string; alpha3Code: String }) => {
-      return {
-        name: res.name,
-        alpha3Code: res.alpha3Code
-      }
-    })
+    try {
+      const response = await countryAxiosInstance.get(`name/${searchQuery}`)
+      return response!.data!.map(
+        (res: { name: string; alpha3Code: String }) => {
+          return {
+            name: res.name,
+            alpha3Code: res.alpha3Code
+          }
+        }
+      )
+    } catch (e) {
+      return []
+    }
   }
 
-  @Query(() => Country)
+  @Mutation(() => Country)
   @UseMiddleware(isAuth)
   async searchData(
     @Arg('countryCode', () => String) countryCode: string

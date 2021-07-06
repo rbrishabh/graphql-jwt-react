@@ -14,6 +14,23 @@ export type Scalars = {
   Float: number;
 };
 
+export type Country = {
+  __typename?: 'Country';
+  name: Scalars['String'];
+  population: Scalars['String'];
+  alpha3Code: Scalars['String'];
+  currencies: Array<CurrencyType>;
+};
+
+export type CurrencyType = {
+  __typename?: 'CurrencyType';
+  code: Scalars['String'];
+  name: Scalars['String'];
+  symbol: Scalars['String'];
+  exchangeRateToSEK: Scalars['Float'];
+  exchangeRateFromSEK: Scalars['Float'];
+};
+
 export type LoginResponse = {
   __typename?: 'LoginResponse';
   accessToken: Scalars['String'];
@@ -26,6 +43,8 @@ export type Mutation = {
   revokeRefreshTokensForUser: Scalars['Boolean'];
   logout: Scalars['Boolean'];
   register: Scalars['Boolean'];
+  searchCountry: Array<Country>;
+  searchData: Country;
 };
 
 
@@ -45,6 +64,16 @@ export type MutationRegisterArgs = {
   email: Scalars['String'];
 };
 
+
+export type MutationSearchCountryArgs = {
+  searchQuery: Scalars['String'];
+};
+
+
+export type MutationSearchDataArgs = {
+  countryCode: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
   hello: Scalars['String'];
@@ -58,22 +87,6 @@ export type User = {
   id: Scalars['Int'];
   email: Scalars['String'];
 };
-
-export type ByeQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ByeQuery = (
-  { __typename?: 'Query' }
-  & Pick<Query, 'bye'>
-);
-
-export type HelloQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type HelloQuery = (
-  { __typename?: 'Query' }
-  & Pick<Query, 'hello'>
-);
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String'];
@@ -123,6 +136,36 @@ export type RegisterMutation = (
   & Pick<Mutation, 'register'>
 );
 
+export type SearchCountryMutationVariables = Exact<{
+  searchQuery: Scalars['String'];
+}>;
+
+
+export type SearchCountryMutation = (
+  { __typename?: 'Mutation' }
+  & { searchCountry: Array<(
+    { __typename?: 'Country' }
+    & Pick<Country, 'name' | 'alpha3Code'>
+  )> }
+);
+
+export type SearchDataMutationVariables = Exact<{
+  countryCode: Scalars['String'];
+}>;
+
+
+export type SearchDataMutation = (
+  { __typename?: 'Mutation' }
+  & { searchData: (
+    { __typename?: 'Country' }
+    & Pick<Country, 'name' | 'alpha3Code' | 'population'>
+    & { currencies: Array<(
+      { __typename?: 'CurrencyType' }
+      & Pick<CurrencyType, 'code' | 'name' | 'exchangeRateToSEK' | 'exchangeRateFromSEK' | 'symbol'>
+    )> }
+  ) }
+);
+
 export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -135,70 +178,6 @@ export type UsersQuery = (
 );
 
 
-export const ByeDocument = gql`
-    query Bye {
-  bye
-}
-    `;
-
-/**
- * __useByeQuery__
- *
- * To run a query within a React component, call `useByeQuery` and pass it any options that fit your needs.
- * When your component renders, `useByeQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useByeQuery({
- *   variables: {
- *   },
- * });
- */
-export function useByeQuery(baseOptions?: Apollo.QueryHookOptions<ByeQuery, ByeQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ByeQuery, ByeQueryVariables>(ByeDocument, options);
-      }
-export function useByeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ByeQuery, ByeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ByeQuery, ByeQueryVariables>(ByeDocument, options);
-        }
-export type ByeQueryHookResult = ReturnType<typeof useByeQuery>;
-export type ByeLazyQueryHookResult = ReturnType<typeof useByeLazyQuery>;
-export type ByeQueryResult = Apollo.QueryResult<ByeQuery, ByeQueryVariables>;
-export const HelloDocument = gql`
-    query Hello {
-  hello
-}
-    `;
-
-/**
- * __useHelloQuery__
- *
- * To run a query within a React component, call `useHelloQuery` and pass it any options that fit your needs.
- * When your component renders, `useHelloQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useHelloQuery({
- *   variables: {
- *   },
- * });
- */
-export function useHelloQuery(baseOptions?: Apollo.QueryHookOptions<HelloQuery, HelloQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<HelloQuery, HelloQueryVariables>(HelloDocument, options);
-      }
-export function useHelloLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<HelloQuery, HelloQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<HelloQuery, HelloQueryVariables>(HelloDocument, options);
-        }
-export type HelloQueryHookResult = ReturnType<typeof useHelloQuery>;
-export type HelloLazyQueryHookResult = ReturnType<typeof useHelloLazyQuery>;
-export type HelloQueryResult = Apollo.QueryResult<HelloQuery, HelloQueryVariables>;
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
@@ -334,6 +313,82 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const SearchCountryDocument = gql`
+    mutation SearchCountry($searchQuery: String!) {
+  searchCountry(searchQuery: $searchQuery) {
+    name
+    alpha3Code
+  }
+}
+    `;
+export type SearchCountryMutationFn = Apollo.MutationFunction<SearchCountryMutation, SearchCountryMutationVariables>;
+
+/**
+ * __useSearchCountryMutation__
+ *
+ * To run a mutation, you first call `useSearchCountryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSearchCountryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [searchCountryMutation, { data, loading, error }] = useSearchCountryMutation({
+ *   variables: {
+ *      searchQuery: // value for 'searchQuery'
+ *   },
+ * });
+ */
+export function useSearchCountryMutation(baseOptions?: Apollo.MutationHookOptions<SearchCountryMutation, SearchCountryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SearchCountryMutation, SearchCountryMutationVariables>(SearchCountryDocument, options);
+      }
+export type SearchCountryMutationHookResult = ReturnType<typeof useSearchCountryMutation>;
+export type SearchCountryMutationResult = Apollo.MutationResult<SearchCountryMutation>;
+export type SearchCountryMutationOptions = Apollo.BaseMutationOptions<SearchCountryMutation, SearchCountryMutationVariables>;
+export const SearchDataDocument = gql`
+    mutation SearchData($countryCode: String!) {
+  searchData(countryCode: $countryCode) {
+    name
+    alpha3Code
+    currencies {
+      code
+      name
+      exchangeRateToSEK
+      exchangeRateFromSEK
+      symbol
+    }
+    population
+  }
+}
+    `;
+export type SearchDataMutationFn = Apollo.MutationFunction<SearchDataMutation, SearchDataMutationVariables>;
+
+/**
+ * __useSearchDataMutation__
+ *
+ * To run a mutation, you first call `useSearchDataMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSearchDataMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [searchDataMutation, { data, loading, error }] = useSearchDataMutation({
+ *   variables: {
+ *      countryCode: // value for 'countryCode'
+ *   },
+ * });
+ */
+export function useSearchDataMutation(baseOptions?: Apollo.MutationHookOptions<SearchDataMutation, SearchDataMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SearchDataMutation, SearchDataMutationVariables>(SearchDataDocument, options);
+      }
+export type SearchDataMutationHookResult = ReturnType<typeof useSearchDataMutation>;
+export type SearchDataMutationResult = Apollo.MutationResult<SearchDataMutation>;
+export type SearchDataMutationOptions = Apollo.BaseMutationOptions<SearchDataMutation, SearchDataMutationVariables>;
 export const UsersDocument = gql`
     query Users {
   users {
